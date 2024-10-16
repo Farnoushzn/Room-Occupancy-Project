@@ -32,7 +32,9 @@ jobs:
       # Step 4: Set lowercase repository name (to avoid Docker tag issues)
       - name: Set lowercase repository name
         id: repository_name
-        run: echo "REPO_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+        run: REPO_NAME="${{ github.repository }}"
+             REPO_NAME_LOWER=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
+             echo "REPO_NAME_LOWER=$REPO_NAME_LOWER" >> $GITHUB_ENVecho "REPO_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
 
       # Step 5: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
