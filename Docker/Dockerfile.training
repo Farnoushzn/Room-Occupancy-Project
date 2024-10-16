@@ -1,4 +1,4 @@
-# Dockerfile for Model Training Pipeline using Jupyter Notebooks
+# Dockerfile for Model Training Pipeline
 
 # Step 1: Use the official Python base image
 FROM python:3.8-slim
@@ -6,26 +6,16 @@ FROM python:3.8-slim
 # Step 2: Set the working directory inside the container
 WORKDIR /app
 
-# Step 3: Copy the requirements.txt file from the project
-COPY ../requirements.txt /app/requirements.txt
+# Step 3: Copy the requirements.txt file from the project root (relative to build context)
+COPY requirements.txt /app/requirements.txt
 
 # Step 4: Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Step 5: Install Jupyter and nbconvert to execute notebooks
-#RUN pip install jupyter nbconvert
+# Step 5: Copy the scripts, dataset, and models from the project root (relative to build context)
+COPY scripts /app/scripts
+COPY Dataset /app/Dataset
+COPY Models /app/Models
 
-# Step 6: Copy the notebooks and data needed for model training into the container
-COPY ../scripts /app/scripts
-COPY ../Dataset /app/Dataset
-
-# Step 7: Copy the models folder to store trained models (if updating existing models)
-COPY ../Models /app/Models
-
-
-
-# Step 8: Convert the Jupyter notebook to a Python script and execute it
-#RUN jupyter nbconvert --to script /app/notebooks/ModelTraining.ipynb && \
-    #python /app/notebooks/ModelTraining.py
-# Step 8: Run the Python training script
+# Step 6: Run the Python training script
 CMD ["python", "/app/scripts/ModelTraining.py"]
