@@ -12,6 +12,8 @@ jobs:
   # Job 1: Build, Test, and Push Training Pipeline
   training_pipeline:
     runs-on: ubuntu-latest
+    outputs:
+      repo_name_lower: ${{ steps.repository_name.outputs.REPO_NAME_LOWER }}
     steps:
       # Step 1: Check out the repository to work with
       - name: Checkout Repository
@@ -32,9 +34,12 @@ jobs:
       # Step 4: Set lowercase repository name (to avoid Docker tag issues)
       - name: Set lowercase repository name
         id: repository_name
-        run: REPO_NAME="${{ github.repository }}"
-             REPO_NAME_LOWER=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
-             echo "REPO_NAME_LOWER=$REPO_NAME_LOWER" >> $GITHUB_ENVecho "REPO_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
+        run: |
+          REPO_NAME="${{ github.repository }}"
+          REPO_NAME_LOWER=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
+          echo "REPO_NAME_LOWER=$REPO_NAME_LOWER" >> $GITHUB_ENV
+        outputs:
+          REPO_NAME_LOWER: ${{ env.REPO_NAME_LOWER }}
 
       # Step 5: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -46,9 +51,11 @@ jobs:
 
       # Step 6: Build and Push Training Image
       - name: Build and Push Training Image
+        env:
+          REPO_NAME_LOWER: ${{ env.REPO_NAME_LOWER }}
         run: |
-          docker build -f Docker/Dockerfile.training -t ghcr.io/${{ env.REPO_NAME }}/room-occupancy-training:latest .
-          docker push ghcr.io/${{ env.REPO_NAME }}/room-occupancy-training:latest
+          docker build -f Docker/Dockerfile.training -t ghcr.io/${REPO_NAME_LOWER}/room-occupancy-training:latest .
+          docker push ghcr.io/${REPO_NAME_LOWER}/room-occupancy-training:latest
 
   # Job 2: Build, Test, and Push API Endpoint Service
   api_endpoint:
@@ -59,12 +66,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Set lowercase repository name (to avoid Docker tag issues)
-      - name: Set lowercase repository name
-        id: repository_name
-        run: echo "REPO_NAME=${{ github.repository }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
-
-      # Step 3: Log in to GitHub Container Registry
+      # Step 2: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -72,8 +74,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 4: Build and Push API Image
+      # Step 3: Build and Push API Image
       - name: Build and Push API Image
+        env:
+          REPO_NAME_LOWER: ${{ needs.training_pipeline.outputs.repo_name_lower }}
         run: |
-          docker build -f Docker/Dockerfile.api -t ghcr.io/${{ env.REPO_NAME }}/room-occupancy-api:latest .
-          docker push ghcr.io/${{ env.REPO_NAME }}/room-occupancy-api:latest
+          docker build -f Docker/Dockerfile.api -t ghcr.io/${REPO_NAME_LOWER}/room-occupancy-api:latest .
+          docker push ghcr.io/${REPO_NAME_LOWER}/room-occupancy-api:latest
