@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Step 5: Copy the scripts, dataset, and models from the project root (relative to build context)
 COPY scripts /app/scripts
 COPY Dataset /app/Dataset
-COPY Models /app/Models
+# COPY Models /app/Models
 
 # Step 6: Run the Python training script
 CMD ["python", "/app/scripts/ModelTraining.py"]
