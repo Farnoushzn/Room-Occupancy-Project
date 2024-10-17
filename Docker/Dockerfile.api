@@ -16,14 +16,17 @@ COPY ../API /app
 # Step 6: Copy the model into the container
 COPY ../Models /app/Models
 
-# Step 7: Expose the port that Flask will use
+# Step 7: Copy the scripts folder to the container (THIS IS THE NEW ADDITION)
+COPY ../scripts /app/scripts
+
+# Step 8: Expose the port that Flask will use
 EXPOSE 5000
 
-# Step 8: Set the environment variable to inform Flask it runs in a container
+# Step 9: Set the environment variable to inform Flask it runs in a container
 ENV FLASK_APP=app.py
 
-# Step 9: Set environment variable for the model path
+# Step 10: Set environment variable for the model path
 ENV MODEL_PATH="/app/Models/xgb_occupancy_model.pkl"  
 
-# Step 10: Command to run the Flask API
+# Step 11: Command to run the Flask API
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
