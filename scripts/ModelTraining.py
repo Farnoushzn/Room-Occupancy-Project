@@ -27,10 +27,10 @@ logger.addHandler(file_handler)
 
 try:
     # Load preprocessed datasets
-    train_path = os.getenv('TRAIN_PATH', "app/Dataset/Processed_data/processed_train.csv")
-    val_path = os.getenv('VAL_PATH', "app/Dataset/Processed_data/processed_val.csv")
-    test_path = os.getenv('TEST_PATH', "app/Dataset/Processed_data/processed_test.csv")
-    model_save_path = os.getenv('MODEL_SAVE_PATH', "app/Models/xgb_occupancy_model.pkl")  # Default to local path
+    train_path = os.getenv('TRAIN_PATH', "./Dataset/Processed_data/processed_train.csv")
+    val_path = os.getenv('VAL_PATH', "./Dataset/Processed_data/processed_val.csv")
+    test_path = os.getenv('TEST_PATH', "./Dataset/Processed_data/processed_test.csv")
+    model_save_path = os.getenv('MODEL_SAVE_PATH', "./Models/xgb_occupancy_model.pkl")  # Default to local path
 
     df_train_encoded = pd.read_csv(train_path)
     df_val_encoded = pd.read_csv(val_path)
