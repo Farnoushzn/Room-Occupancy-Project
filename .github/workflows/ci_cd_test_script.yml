@@ -72,14 +72,18 @@ jobs:
           docker stop room-occupancy-testing-container
           docker rm room-occupancy-testing-container
 
-      # Step 9: Commit and Push the Model to the Repository
+      # Step 9: Commit and Push the Model to the Repository (if there are changes)
       - name: Commit and Push Trained Model
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add Models/xgb_occupancy_model.pkl Models/training_log.txt
-          git commit -m "Add trained model and training log"
-          git push
+          if [[ `git status --porcelain` ]]; then
+            git add Models/xgb_occupancy_model.pkl Models/training_log.txt
+            git commit -m "Add trained model and training log"
+            git push
+          else
+            echo "No changes to commit"
+          fi
 
       # Step 10: Upload Training Log as an Artifact (Retain Historical Logs)
       - name: Upload Training Log
