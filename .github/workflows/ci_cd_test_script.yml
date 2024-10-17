@@ -56,23 +56,29 @@ jobs:
           docker build -f Docker/Dockerfile.training -t ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest .
           docker push ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest
 
-      # Step 7: Run the Training Container and Save Model
+      # Step 7: Remove Existing Training Container (If Exists)
+      - name: Remove Existing Training Container
+        run: |
+          if [ $(docker ps -a -q -f name=room-occupancy-training-container) ]; then
+            docker stop room-occupancy-training-container
+            docker rm room-occupancy-training-container
+          fi
+
+      # Step 8: Run the Training Container and Save Model
       - name: Run Training and Save Model
         run: |
           docker run --name room-occupancy-training-container ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest /app/scripts/ModelTraining.py
           docker cp room-occupancy-training-container:/app/Models/xgb_occupancy_model.pkl ./Models/xgb_occupancy_model.pkl
           docker cp room-occupancy-training-container:/app/Models/training_log.txt ./Models/training_log.txt
-      # docker stop room-occupancy-training-container
-      # docker rm room-occupancy-training-container
 
-      # Step 8: Create a Separate Container for Testing the Model
+      # Step 9: Create a Separate Container for Testing the Model
       - name: Test Trained Model in Separate Container
         run: |
           docker run --name room-occupancy-testing-container ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest /app/scripts/ModelTest.py
           docker stop room-occupancy-testing-container
           docker rm room-occupancy-testing-container
 
-      # Step 9: Commit and Push the Model to the Repository (if there are changes)
+      # Step 10: Commit and Push the Model to the Repository (if there are changes)
       - name: Commit and Push Trained Model
         run: |
           git config --global user.name "GitHub Actions"
@@ -85,9 +91,9 @@ jobs:
             echo "No changes to commit"
           fi
 
-      # Step 10: Upload Training Log as an Artifact (Retain Historical Logs)
+      # Step 11: Upload Training Log as an Artifact (Retain Historical Logs)
       - name: Upload Training Log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: training-log
           path: ./Models/training_log.txt
@@ -118,25 +124,33 @@ jobs:
           docker build -f Docker/Dockerfile.api -t ghcr.io/${{ needs.training_pipeline.outputs.repo_name_lower }}/room-occupancy-api:latest .
           docker push ghcr.io/${{ needs.training_pipeline.outputs.repo_name_lower }}/room-occupancy-api:latest
 
-      # Step 4: Run the API container in detach mode
+      # Step 4: Remove Existing API Container (If Exists)
+      - name: Remove Existing API Container
+        run: |
+          if [ $(docker ps -a -q -f name=room-occupancy-api) ]; then
+            docker stop room-occupancy-api
+            docker rm room-occupancy-api
+          fi
+
+      # Step 5: Run the API container in detach mode
       - name: Run API Container
         run: |
           docker run -d -p 5000:5000 --name room-occupancy-api ghcr.io/${{ needs.training_pipeline.outputs.repo_name_lower }}/room-occupancy-api:latest
         # Note: Detach mode (-d) runs the container in the background
 
-      # Step 5: Install dependencies for testing
+      # Step 6: Install dependencies for testing
       - name: Install Dependencies for Testing
         run: |
           python -m pip install requests  # Make sure requests is installed to run prediction_req.py
 
-      # Step 6: Test the API using the provided Python script
+      # Step 7: Test the API using the provided Python script
       - name: Test the API using prediction_req.py
         run: |
           sleep 15  # Wait for the container to be up and running (give some time to start the server)
           python scripts/prediction_req.py
 
-      # Step 7: Stop and Remove API Container after testing
-      #- name: Stop and Remove API Container
-      #  run: |
-      #    docker stop room-occupancy-api
-      #    docker rm room-occupancy-api
+      # Step 8: Stop and Remove API Container after testing
+      - name: Stop and Remove API Container
+        run: |
+          docker stop room-occupancy-api
+          docker rm room-occupancy-api
