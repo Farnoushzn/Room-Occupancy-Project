@@ -59,14 +59,18 @@ jobs:
       # Step 7: Run the Training Container and Save Model
       - name: Run Training and Save Model
         run: |
-          docker run --name room-occupancy-training-container ghcr.io/${REPO_NAME_LOWER}/room-occupancy-training:latest
+          docker run --name room-occupancy-training-container ghcr.io/${{ env.REPO_NAME_LOWER }}/room-occupancy-training:latest /app/scripts/ModelTraining.py
           docker cp room-occupancy-training-container:/app/Models/xgb_occupancy_model.pkl ./Models/xgb_occupancy_model.pkl
           docker cp room-occupancy-training-container:/app/Models/training_log.txt ./Models/training_log.txt
+          docker stop room-occupancy-training-container
+          docker rm room-occupancy-training-container
 
       # Step 8: Create a Separate Container for Testing the Model
       - name: Test Trained Model in Separate Container
         run: |
-          docker run --name room-occupancy-testing-container ghcr.io/${REPO_NAME_LOWER}/room-occupancy-training:latest python /app/scripts/test_model.py
+          docker run --name room-occupancy-testing-container ghcr.io/${{ env.REPO_NAME_LOWER }}/room-occupancy-training:latest /app/scripts/test_model.py
+          docker stop room-occupancy-testing-container
+          docker rm room-occupancy-testing-container
 
       # Step 9: Commit and Push the Model to the Repository
       - name: Commit and Push Trained Model
@@ -129,7 +133,7 @@ jobs:
           sleep 15  # Wait for the container to be up and running (give some time to start the server)
           python scripts/Prediction_req.py
 
-      # Step 7: Stop the API container after testing
+      # Step 7: Stop and Remove API Container after testing
       - name: Stop and Remove API Container
         run: |
           docker stop room-occupancy-api
