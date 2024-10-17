@@ -6,13 +6,13 @@ Starting hyperparameter optimization with RandomizedSearchCV...
 Hyperparameter optimization completed.
 Best Parameters found by Random Search: {'subsample': 0.6, 'n_estimators': 150, 'max_depth': 10, 'learning_rate': 0.01, 'colsample_bytree': 0.8}
 Validation ROC AUC Score with Best Hyperparameters: 0.99
-Best trained XGBoost model saved at: ./Models/xgb_occupancy_model.pkl
+Best trained XGBoost model saved at: /app/Models/xgb_occupancy_model.pkl
 Summary of Model Training Results:
 Validation ROC AUC Score with Best Hyperparameters: 0.99
 Validation Accuracy Score: 0.94
 Confusion Matrix:
-[[1651   42]
- [ 122  850]]
+[[1652   41]
+ [ 127  845]]
 Classification Report:
               precision    recall  f1-score   support
 
