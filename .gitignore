@@ -21,13 +21,13 @@ __pycache__/
 
 # Ignore models folder, but allow the specific model file that you want to commit.
 # Use ! to include specific files that should be tracked
-models/
-!models/xgb_occupancy_model.pkl 
+#Models/
+#!Models/xgb_occupancy_model.pkl 
 
 
 # Ignore logs in general, but allow specific training log file
-*.log
-!Models/training_log.txt
+#*.log
+#!Models/training_log.txt
 
 # Ignore other large temporary files
 *.tmp

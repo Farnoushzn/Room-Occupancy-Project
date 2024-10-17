@@ -1,0 +1,25 @@
+Starting model training...
+Model training completed successfully.
+Validation ROC AUC Score: 0.99
+Validation Accuracy Score: 0.98
+Starting hyperparameter optimization with RandomizedSearchCV...
+Hyperparameter optimization completed.
+Best Parameters found by Random Search: {'subsample': 0.6, 'n_estimators': 150, 'max_depth': 10, 'learning_rate': 0.01, 'colsample_bytree': 0.8}
+Validation ROC AUC Score with Best Hyperparameters: 0.99
+Best trained XGBoost model saved at: ./Models/xgb_occupancy_model.pkl
+Summary of Model Training Results:
+Validation ROC AUC Score with Best Hyperparameters: 0.99
+Validation Accuracy Score: 0.94
+Confusion Matrix:
+[[1651   42]
+ [ 122  850]]
+Classification Report:
+              precision    recall  f1-score   support
+
+         0.0       0.93      0.98      0.95      1693
+         1.0       0.95      0.87      0.91       972
+
+    accuracy                           0.94      2665
+   macro avg       0.94      0.92      0.93      2665
+weighted avg       0.94      0.94      0.94      2665
+
