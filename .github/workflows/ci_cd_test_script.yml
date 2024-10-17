@@ -13,7 +13,7 @@ jobs:
   training_pipeline:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write  # Explicitly grant write permission to packages
     steps:
       # Step 1: Check out the repository to work with
