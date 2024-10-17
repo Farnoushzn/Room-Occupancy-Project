@@ -74,7 +74,7 @@ jobs:
       # Step 9: Create a Separate Container for Testing the Model
       - name: Test Trained Model in Separate Container
         run: |
-          docker run --name room-occupancy-testing-container ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest /app/scripts/ModelTest.py
+          docker run -v ./Models:/app/Models --name room-occupancy-testing-container ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest /app/scripts/ModelTest.py
           docker stop room-occupancy-testing-container
           docker rm room-occupancy-testing-container
 
