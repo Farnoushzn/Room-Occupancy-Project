@@ -4,8 +4,8 @@ import os
 from sklearn.metrics import accuracy_score, roc_auc_score, classification_report, confusion_matrix
 
 # Load environment variables for paths (similar to ModelTraining.py)
-test_path = os.getenv('TEST_PATH', "app/Dataset/Processed_data/processed_test.csv")
-model_path = os.getenv('MODEL_SAVE_PATH', "app/Models/xgb_occupancy_model.pkl")
+test_path = os.getenv('TEST_PATH', "./Dataset/Processed_data/processed_test.csv")
+model_path = os.getenv('MODEL_SAVE_PATH', "./Models/xgb_occupancy_model.pkl")
 
 try:
     # Load the saved model
