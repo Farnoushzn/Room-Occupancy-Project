@@ -17,10 +17,17 @@ __pycache__/
 .idea/
 
 # Ignore data files (optional, depending on what data you want in the repo)
-data/
+#data/
 
-# Ignore models (optional, depending on if you want trained models in Git)
+# Ignore models folder, but allow the specific model file that you want to commit.
+# Use ! to include specific files that should be tracked
 models/
+!models/xgb_occupancy_model.pkl 
 
-# Ignore logs or other large temporary files
+
+# Ignore logs in general, but allow specific training log file
 *.log
+!Models/training_log.txt
+
+# Ignore other large temporary files
+*.tmp

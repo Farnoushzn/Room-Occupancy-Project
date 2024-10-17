@@ -16,6 +16,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY scripts /app/scripts
 COPY Dataset /app/Dataset
 # COPY Models /app/Models
+RUN mkdir -p /app/Models
+
+# Step 6: Set environment variables for paths
+ENV TRAIN_PATH="/app/Dataset/Processed_data/processed_train.csv"
+ENV VAL_PATH="/app/Dataset/Processed_data/processed_val.csv"
+ENV TEST_PATH="/app/Dataset/Processed_data/processed_test.csv"
+ENV MODEL_SAVE_PATH="/app/Models/xgb_occupancy_model.pkl"
+ENV LOG_FILE_PATH="/app/Models/training_log.txt" 
 
 # Step 6: Run the Python training script
 CMD ["python", "/app/scripts/ModelTraining.py"]

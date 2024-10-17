@@ -36,13 +36,17 @@ from flask import Flask, request, jsonify
 import joblib
 import numpy as np
 import pandas as pd
+import os
 
 # Initialize the Flask app
 app = Flask(__name__)
 
 # Load the trained model
-model_path = "Models/xgb_occupancy_model.pkl"
+#model_path = "Models/xgb_occupancy_model.pkl"
+# Use environment variable to determine the model path to ensure consistency in Docker and local environments
+model_path = os.getenv('MODEL_PATH', "Models/xgb_occupancy_model.pkl")  # Default to local path
 model = joblib.load(model_path)
+
 
 # Load columns used in model training (to ensure alignment)
 feature_columns = [

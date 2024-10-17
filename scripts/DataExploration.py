@@ -282,13 +282,13 @@ df_test_final = df_test_final.drop(columns=['date'])
 
 # Display first few rows of the processed training data to verify
 print("Final Preprocessed Training Data:")
-display(df_train_final.head())
+print(df_train_final.head())
 
 print("Validation Data after Preprocessing:")
-display(df_val_final.head())
+print(df_val_final.head())
 
 print("Test Data after Preprocessing:")
-display(df_test_final.head())
+print(df_test_final.head())
 
 
 # %% [markdown]
