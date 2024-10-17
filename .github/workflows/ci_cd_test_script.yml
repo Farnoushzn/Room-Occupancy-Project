@@ -79,7 +79,7 @@ jobs:
 
       # Step 10: Upload Training Log as an Artifact (Retain Historical Logs)
       - name: Upload Training Log
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: training-log
           path: ./Models/training_log.txt
