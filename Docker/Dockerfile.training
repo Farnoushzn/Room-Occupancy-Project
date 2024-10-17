@@ -25,5 +25,8 @@ ENV TEST_PATH="/app/Dataset/Processed_data/processed_test.csv"
 ENV MODEL_SAVE_PATH="/app/Models/xgb_occupancy_model.pkl"
 ENV LOG_FILE_PATH="/app/Models/training_log.txt" 
 
-# Step 6: Run the Python training script
-CMD ["python", "/app/scripts/ModelTraining.py"]
+# Step 7: Run the Python training script
+#CMD ["python", "/app/scripts/ModelTraining.py"]
+
+# Step 7: Set entrypoint so that the command can be provided dynamically for both training and testing containers
+ENTRYPOINT ["python"]
