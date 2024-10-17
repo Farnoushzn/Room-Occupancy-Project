@@ -15,6 +15,8 @@ jobs:
     permissions:
       contents: write
       packages: write  # Explicitly grant write permission to packages
+    outputs:
+      repo_name_lower: ${{ steps.set_repo_name.outputs.repo_name_lower }}
     steps:
       # Step 1: Check out the repository to work with
       - name: Checkout Repository
@@ -34,11 +36,11 @@ jobs:
 
       # Step 4: Set lowercase repository name (to avoid Docker tag issues)
       - name: Set lowercase repository name
-        id: repository_name
+        id: set_repo_name
         run: |
           REPO_NAME="${{ github.repository }}"
           REPO_NAME_LOWER=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
-          echo "REPO_NAME_LOWER=$REPO_NAME_LOWER" >> $GITHUB_ENV
+          echo "repo_name_lower=$REPO_NAME_LOWER" >> $GITHUB_OUTPUT
 
       # Step 5: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
@@ -50,16 +52,14 @@ jobs:
 
       # Step 6: Build and Push Training Image
       - name: Build and Push Training Image
-        env:
-          REPO_NAME_LOWER: ${{ env.REPO_NAME_LOWER }}
         run: |
-          docker build -f Docker/Dockerfile.training -t ghcr.io/${REPO_NAME_LOWER}/room-occupancy-training:latest .
-          docker push ghcr.io/${REPO_NAME_LOWER}/room-occupancy-training:latest
+          docker build -f Docker/Dockerfile.training -t ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest .
+          docker push ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest
 
       # Step 7: Run the Training Container and Save Model
       - name: Run Training and Save Model
         run: |
-          docker run --name room-occupancy-training-container ghcr.io/${{ env.REPO_NAME_LOWER }}/room-occupancy-training:latest /app/scripts/ModelTraining.py
+          docker run --name room-occupancy-training-container ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest /app/scripts/ModelTraining.py
           docker cp room-occupancy-training-container:/app/Models/xgb_occupancy_model.pkl ./Models/xgb_occupancy_model.pkl
           docker cp room-occupancy-training-container:/app/Models/training_log.txt ./Models/training_log.txt
           docker stop room-occupancy-training-container
@@ -68,7 +68,7 @@ jobs:
       # Step 8: Create a Separate Container for Testing the Model
       - name: Test Trained Model in Separate Container
         run: |
-          docker run --name room-occupancy-testing-container ghcr.io/${{ env.REPO_NAME_LOWER }}/room-occupancy-training:latest /app/scripts/ModelTest.py
+          docker run --name room-occupancy-testing-container ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest /app/scripts/ModelTest.py
           docker stop room-occupancy-testing-container
           docker rm room-occupancy-testing-container
 
@@ -110,16 +110,14 @@ jobs:
 
       # Step 3: Build and Push API Image
       - name: Build and Push API Image
-        env:
-          REPO_NAME_LOWER: ${{ env.REPO_NAME_LOWER }}
         run: |
-          docker build -f Docker/Dockerfile.api -t ghcr.io/${REPO_NAME_LOWER}/room-occupancy-api:latest .
-          docker push ghcr.io/${REPO_NAME_LOWER}/room-occupancy-api:latest
+          docker build -f Docker/Dockerfile.api -t ghcr.io/${{ needs.training_pipeline.outputs.repo_name_lower }}/room-occupancy-api:latest .
+          docker push ghcr.io/${{ needs.training_pipeline.outputs.repo_name_lower }}/room-occupancy-api:latest
 
       # Step 4: Run the API container in detach mode
       - name: Run API Container
         run: |
-          docker run -d -p 5000:5000 --name room-occupancy-api ghcr.io/${REPO_NAME_LOWER}/room-occupancy-api:latest
+          docker run -d -p 5000:5000 --name room-occupancy-api ghcr.io/${{ needs.training_pipeline.outputs.repo_name_lower }}/room-occupancy-api:latest
         # Note: Detach mode (-d) runs the container in the background
 
       # Step 5: Install dependencies for testing
