@@ -62,8 +62,8 @@ jobs:
           docker run --name room-occupancy-training-container ghcr.io/${{ steps.set_repo_name.outputs.repo_name_lower }}/room-occupancy-training:latest /app/scripts/ModelTraining.py
           docker cp room-occupancy-training-container:/app/Models/xgb_occupancy_model.pkl ./Models/xgb_occupancy_model.pkl
           docker cp room-occupancy-training-container:/app/Models/training_log.txt ./Models/training_log.txt
-          docker stop room-occupancy-training-container
-          docker rm room-occupancy-training-container
+      # docker stop room-occupancy-training-container
+      # docker rm room-occupancy-training-container
 
       # Step 8: Create a Separate Container for Testing the Model
       - name: Test Trained Model in Separate Container
@@ -127,16 +127,16 @@ jobs:
       # Step 5: Install dependencies for testing
       - name: Install Dependencies for Testing
         run: |
-          python -m pip install requests  # Make sure requests is installed to run Prediction_req.py
+          python -m pip install requests  # Make sure requests is installed to run prediction_req.py
 
       # Step 6: Test the API using the provided Python script
-      - name: Test the API using Prediction_req.py
+      - name: Test the API using prediction_req.py
         run: |
           sleep 15  # Wait for the container to be up and running (give some time to start the server)
-          python scripts/Prediction_req.py
+          python scripts/prediction_req.py
 
       # Step 7: Stop and Remove API Container after testing
-      - name: Stop and Remove API Container
-        run: |
-          docker stop room-occupancy-api
-          docker rm room-occupancy-api
+      #- name: Stop and Remove API Container
+      #  run: |
+      #    docker stop room-occupancy-api
+      #    docker rm room-occupancy-api
